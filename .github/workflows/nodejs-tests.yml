@@ -26,9 +26,9 @@ jobs:
         cache: 'npm'
 
     - name: Install backend dependencies
-      working-directory: task-manager-app/backend
+      working-directory: backend
       run: npm ci
 
     - name: Run backend tests
-      working-directory: task-manager-app/backend
+      working-directory: backend
       run: npm test
