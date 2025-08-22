@@ -1,50 +1,44 @@
-# React + TypeScript + Vite
+# Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Vite + React + TypeScript + Tailwind CSS frontend for Task Manager App.
 
-Currently, two official plugins are available:
+## Requirements
+- Node.js 18+
+- npm 9+
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Setup
+```bash
+cd frontend
+npm ci
+cp .env.example .env
+# Default backend in this repo runs at http://localhost:3001
+# Update VITE_API_URL in .env if your backend runs elsewhere
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+## Development
+```bash
+npm run dev
 ```
+Dev server: http://localhost:5173
+
+## Build
+```bash
+npm run typecheck
+npm run build
+```
+
+## Configuration
+Set the backend API URL:
+```
+VITE_API_URL=http://localhost:3001
+```
+
+## Implemented (Phase 2)
+- Add Task form: title (required), description (optional), priority (optional; default medium)
+- Client-side validation via react-hook-form + zod
+- API integration to POST /api/tasks with success/error handling
+- Clean minimal UI with Tailwind
+
+## Notes
+- Backend API is in ../backend (port 3001 by default).
+- Validation mirrors rules in the root README.
