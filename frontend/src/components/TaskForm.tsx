@@ -1,8 +1,8 @@
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createTask, TaskPayload } from '../lib/api';
+import { useToast } from '@/hooks/use-toast';
 
 const schema = z.object({
   title: z.string().min(1, 'Title is required').max(255, 'Max 255 chars'),
@@ -12,10 +12,8 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
-export default function TaskForm() {
-  const [status, setStatus] = useState<{ type: 'idle' | 'success' | 'error'; message?: string }>({
-    type: 'idle',
-  });
+export default function TaskForm({ onCreated }: { onCreated?: () => void }) {
+  const { toast } = useToast();
 
   const {
     register,
@@ -32,7 +30,6 @@ export default function TaskForm() {
   });
 
   const onSubmit = async (values: FormValues) => {
-    setStatus({ type: 'idle' });
     const payload: TaskPayload = {
       title: values.title.trim(),
       description: values.description?.trim() || undefined,
@@ -40,10 +37,15 @@ export default function TaskForm() {
     };
     try {
       await createTask(payload);
-      setStatus({ type: 'success', message: 'Task created successfully.' });
+      toast({ title: 'Task created', description: 'Your task was added successfully.' });
       reset({ title: '', description: '', priority: 'medium' });
+      onCreated?.();
     } catch (e: any) {
-      setStatus({ type: 'error', message: e?.message || 'Failed to create task' });
+      toast({
+        title: 'Failed to create task',
+        description: e?.message || 'Request failed',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -103,10 +105,6 @@ export default function TaskForm() {
         >
           {isSubmitting ? 'Submitting...' : 'Create Task'}
         </button>
-        {status.type === 'success' && (
-          <span className="text-sm text-green-700">{status.message}</span>
-        )}
-        {status.type === 'error' && <span className="text-sm text-red-700">{status.message}</span>}
       </div>
     </form>
   );

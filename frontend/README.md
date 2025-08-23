@@ -27,6 +27,12 @@ npm run typecheck
 npm run build
 ```
 
+## Testing
+```bash
+npm run test       # run tests in watch mode
+npm run test:ci    # run tests once with coverage
+```
+
 ## Configuration
 Set the backend API URL:
 ```
@@ -39,6 +45,14 @@ VITE_API_URL=http://localhost:3001
 - API integration to POST /api/tasks with success/error handling
 - Clean minimal UI with Tailwind
 
+## Implemented (Phase 3)
+- Task List view fetching from `GET /api/tasks` with loading/empty/error states
+- Toast notifications for success/error using existing toaster
+- Detailed validation error messages surfaced from backend
+- Frontend unit and integration tests (Vitest + React Testing Library)
+- Frontend CI workflow on push/PR to run tests
+
 ## Notes
 - Backend API is in ../backend (port 3001 by default).
+- Ensure `VITE_API_URL` points to your backend.
 - Validation mirrors rules in the root README.
