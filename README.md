@@ -71,7 +71,8 @@ The backend server will start on `http://localhost:3001`
 - Create task: `POST http://localhost:3001/api/tasks`
 - Get all tasks: `GET http://localhost:3001/api/tasks`
 - Get task by ID: `GET http://localhost:3001/api/tasks/:id`
-
+- Update task: `PUT http://localhost:3001/api/tasks/:id` (title, description, priority)
+- Delete task: `DELETE http://localhost:3001/api/tasks/:id`
 ### Frontend Development Server
 
 ```bash
@@ -134,6 +135,29 @@ curl http://localhost:3001/api/tasks
 
 ```bash
 curl http://localhost:3001/api/tasks/1
+### Update Task
+
+```bash
+curl -X PUT http://localhost:3001/api/tasks/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Updated title",
+    "priority": "high"
+  }'
+```
+
+### Delete Task
+
+```bash
+curl -X DELETE http://localhost:3001/api/tasks/1
+```
+
+### Frontend UI Notes
+
+- Task list includes filter by priority and sort controls (by date or priority).
+- Tasks can be edited via an inline modal with validation and deleted with a confirmation prompt.
+- Pagination is deferred to a future phase to keep implementation minimal and ACU-efficient.
+
 ```
 
 ## Database Schema

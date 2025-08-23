@@ -153,6 +153,51 @@ describe('API Endpoints', () => {
         });
     });
 
+    describe('PUT /api/tasks/:id', () => {
+        test('should update task fields', async () => {
+            const createRes = await request(app).post('/api/tasks').send({ title: 'A', priority: 'low' }).expect(201);
+            const id = createRes.body.data.id;
+            const res = await request(app).put(`/api/tasks/${id}`).send({ title: 'B', priority: 'high' }).expect(200);
+            expect(res.body.success).toBe(true);
+            expect(res.body.data.title).toBe('B');
+            expect(res.body.data.priority).toBe('high');
+        });
+
+        test('should return 400 when no fields provided', async () => {
+            const createRes = await request(app).post('/api/tasks').send({ title: 'A' }).expect(201);
+            const id = createRes.body.data.id;
+            const res = await request(app).put(`/api/tasks/${id}`).send({}).expect(400);
+            expect(res.body.success).toBe(false);
+        });
+
+        test('should validate fields and return 400', async () => {
+            const createRes = await request(app).post('/api/tasks').send({ title: 'A' }).expect(201);
+            const id = createRes.body.data.id;
+            await request(app).put(`/api/tasks/${id}`).send({ title: '' }).expect(400);
+            await request(app).put(`/api/tasks/${id}`).send({ priority: 'invalid' }).expect(400);
+        });
+
+        test('should return 404 when updating missing task', async () => {
+            const res = await request(app).put('/api/tasks/99999').send({ title: 'X' }).expect(404);
+            expect(res.body.success).toBe(false);
+        });
+    });
+
+    describe('DELETE /api/tasks/:id', () => {
+        test('should delete existing task', async () => {
+            const createRes = await request(app).post('/api/tasks').send({ title: 'To delete' }).expect(201);
+            const id = createRes.body.data.id;
+            const delRes = await request(app).delete(`/api/tasks/${id}`).expect(200);
+            expect(delRes.body.success).toBe(true);
+            await request(app).get(`/api/tasks/${id}`).expect(404);
+        });
+
+        test('should return 404 for non-existent task', async () => {
+            const res = await request(app).delete('/api/tasks/123456').expect(404);
+            expect(res.body.success).toBe(false);
+        });
+    });
+
     describe('404 handling', () => {
         test('should return 404 for unknown routes', async () => {
             const response = await request(app)

@@ -96,6 +96,51 @@ class Database {
         });
     }
 
+    async updateTask(id, fields) {
+        return new Promise((resolve, reject) => {
+            const sets = [];
+            const params = [];
+            if (Object.prototype.hasOwnProperty.call(fields, 'title')) {
+                sets.push('title = ?');
+                params.push(fields.title);
+            }
+            if (Object.prototype.hasOwnProperty.call(fields, 'description')) {
+                sets.push('description = ?');
+                params.push(fields.description);
+            }
+            if (Object.prototype.hasOwnProperty.call(fields, 'priority')) {
+                sets.push('priority = ?');
+                params.push(fields.priority);
+            }
+            if (sets.length === 0) {
+                this.getTaskById(id).then(resolve).catch(reject);
+                return;
+            }
+            const sql = `UPDATE tasks SET ${sets.join(', ')} WHERE id = ?`;
+            this.db.run(sql, [...params, id], async (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    const updated = await this.getTaskById(id);
+                    resolve(updated || null);
+                }
+            });
+        });
+    }
+
+    async deleteTask(id) {
+        return new Promise((resolve, reject) => {
+            const sql = 'DELETE FROM tasks WHERE id = ?';
+            this.db.run(sql, [id], function (err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(this.changes > 0);
+                }
+            });
+        });
+    }
+
     close() {
         if (this.db) {
             this.db.close((err) => {
