@@ -112,6 +112,79 @@ app.post('/api/tasks',
         }
     }
 );
+app.put('/api/tasks/:id',
+    [
+        body('title')
+            .optional()
+            .isLength({ min: 1, max: 255 })
+            .withMessage('Title must be between 1 and 255 characters'),
+        body('description')
+            .optional()
+            .isLength({ max: 1000 })
+            .withMessage('Description must not exceed 1000 characters'),
+        body('priority')
+            .optional()
+            .isIn(['low', 'medium', 'high'])
+            .withMessage('Priority must be low, medium, or high')
+    ],
+    handleValidationErrors,
+    async (req, res) => {
+        try {
+            const id = req.params.id;
+            const { title, description, priority } = req.body;
+            if ([title, description, priority].every(v => v === undefined)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'No fields to update'
+                });
+            }
+            const updated = await db.updateTask(id, { title, description, priority });
+            if (!updated) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Task not found'
+                });
+            }
+            res.json({
+                success: true,
+                data: updated,
+                message: 'Task updated successfully'
+            });
+        } catch (error) {
+            console.error('Error updating task:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Failed to update task',
+                error: error.message
+            });
+        }
+    }
+);
+
+app.delete('/api/tasks/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        const deleted = await db.deleteTask(id);
+        if (!deleted) {
+            return res.status(404).json({
+                success: false,
+                message: 'Task not found'
+            });
+        }
+        res.json({
+            success: true,
+            message: 'Task deleted successfully'
+        });
+    } catch (error) {
+        console.error('Error deleting task:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to delete task',
+            error: error.message
+        });
+    }
+});
+
 
 app.use((err, req, res, next) => {
     console.error('Unhandled error:', err);

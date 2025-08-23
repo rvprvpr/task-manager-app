@@ -46,3 +46,30 @@ export async function listTasks(): Promise<Task[]> {
   }
   return json.data || [];
 }
+export async function updateTask(id: number, payload: Partial<TaskPayload>) {
+  const res = await fetch(`${API_URL}/api/tasks/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  const json = (await res.json()) as ApiResponse<any>;
+  if (!res.ok || !json.success) {
+    const detail =
+      json.errors?.map(e => e.msg).join(', ') || json.message || 'Request failed';
+    throw new Error(detail);
+  }
+  return json.data;
+}
+
+export async function deleteTask(id: number) {
+  const res = await fetch(`${API_URL}/api/tasks/${id}`, {
+    method: 'DELETE',
+  });
+  const json = (await res.json()) as ApiResponse<any>;
+  if (!res.ok || !json.success) {
+    const detail =
+      json.errors?.map(e => e.msg).join(', ') || json.message || 'Request failed';
+    throw new Error(detail);
+  }
+  return true;
+}
